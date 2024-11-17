@@ -1,43 +1,66 @@
 from PyPDF2 import PdfReader
 import openai
-from config import os
 
-# PDF 파일 요약 함수
 def pdf_bot_chatbot(pdf_file, prompt):
-    reader = PdfReader(pdf_file.name)
-    text = "".join(page.extract_text() for page in reader.pages)
+    # 파일 업로드 여부 확인
+    if pdf_file is None:
+        return "파일을 업로드해주세요."
 
-    # GPT-4로 요약 생성
-    response = openai.ChatCompletion.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": f'''
-            Please follow the format of {prompt}
-            Please always answer in Korean.
-            '''},
-            {"role": "user", "content": f'''
-            Summarize the following text.
-            Also write explanations about what you learn each week: {text}
-            '''}
-        ],
-        max_tokens=4096
-    )
-    return response['choices'][0]['message']['content'].strip()
+    # PDF 내용 추출
+    try:
+        reader = PdfReader(pdf_file.name)
+        text = "".join(page.extract_text() for page in reader.pages)
+    except Exception as e:
+        return f"PDF 처리 중 오류가 발생했습니다: {e}"
 
-# PDF 기반 질문 응답 함수
-def pdf_chatbot_response(pdf, user_input, summary):
-    reader = PdfReader(pdf.name)
-    text = "".join(page.extract_text() for page in reader.pages)
+    # OpenAI API 호출
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": text}
+            ],
+            max_tokens=150  # 필요에 따라 조정
+        )
+        return response['choices'][0]['message']['content'].strip()
+    except Exception as e:
+        return f"요약 생성 중 오류가 발생했습니다: {e}"
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": f'''
-            Check if the user's question is included in the {summary}.
-            Please always answer in Korean.
-            '''},
-            {"role": "user", "content": user_input}
-        ],
-        max_tokens=4096
-    )
-    return response['choices'][0]['message']['content'].strip()
+
+def pdf_chatbot_response(pdf, user_input, history):
+    # 파일 업로드 여부 확인
+    if pdf is None:
+        return [{"role": "assistant", "content": "파일을 업로드해주세요."}]
+
+    # PDF 내용 추출
+    try:
+        reader = PdfReader(pdf.name)
+        text = "".join(page.extract_text() for page in reader.pages)
+    except Exception as e:
+        return [{"role": "assistant", "content": f"PDF 처리 중 오류가 발생했습니다: {e}"}]
+
+    # 기본 대화 이력 설정
+    if history is None:
+        history = []
+
+    # 메시지 구성
+    messages = history + [{"role": "user", "content": user_input}]
+
+    # OpenAI API 호출
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4o-mini",
+            messages=messages,
+            max_tokens=150  # 필요에 따라 조정
+        )
+
+        assistant_reply = response['choices'][0]['message']['content'].strip()
+
+        # 대화 이력 업데이트
+        history.append({"role": "user", "content": user_input})
+        history.append({"role": "assistant", "content": assistant_reply})
+
+        return history
+    except Exception as e:
+        return [{"role": "assistant", "content": f"응답 생성 중 오류가 발생했습니다: {e}"}]

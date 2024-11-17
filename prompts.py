@@ -1,4 +1,3 @@
-# prompts.py
 default_prompt = '''
 학기: 2024-1학기
 과목명: 객체지향프로그래밍Ⅰ

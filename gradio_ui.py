@@ -1,9 +1,7 @@
 import gradio as gr
 from pdf_processing import pdf_bot_chatbot, pdf_chatbot_response
-from llm_setup import conversation_chain, qa_chain
-from vector_db_setup import vectorstore
+from prompts import default_prompt
 
-# Gradio 인터페이스 구성
 with gr.Blocks() as app:
     # PDF 요약 탭
     with gr.Tab("PDF 문서 요약봇"):
@@ -12,7 +10,7 @@ with gr.Blocks() as app:
         pdf_summary_button = gr.Button("문서 요약", variant="primary")
 
         pdf_summary_button.click(
-            fn=pdf_bot_chatbot,
+            fn=lambda pdf_file: pdf_bot_chatbot(pdf_file, default_prompt),
             inputs=[pdf_input],
             outputs=[summary_output]
         )
@@ -21,12 +19,15 @@ with gr.Blocks() as app:
     with gr.Tab("PDF 기반 챗봇"):
         pdf_input = gr.File(label="PDF 파일 업로드")
         user_input = gr.Textbox(placeholder="질문 입력", lines=1)
-        chatbot_output = gr.Chatbot(value=[[None, "### 안녕하세요, 질문을 입력해주세요."]])
+        chatbot_output = gr.Chatbot(
+            value=[{"role": "assistant", "content": "### 안녕하세요, 질문을 입력해주세요."}],
+            type="messages"
+        )
 
         chatbot_button = gr.Button("보내기")
         chatbot_button.click(
             fn=pdf_chatbot_response,
-            inputs=[pdf_input, user_input],
+            inputs=[pdf_input, user_input, chatbot_output],
             outputs=[chatbot_output]
         )
 

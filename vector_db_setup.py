@@ -1,20 +1,29 @@
 import pinecone
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import Pinecone
-from config import os
+from langchain_openai.embeddings import OpenAIEmbeddings
+from langchain_community.vectorstores import Pinecone
+from dotenv import load_dotenv
+import os
 
-# Pinecone 초기화 및 연결 설정
-pinecone.init(api_key=os.getenv("PINECONE_API_KEY"), environment=os.getenv("PINECONE_ENV"))
+# 환경 변수 로드
+load_dotenv()
+PINECONE_API = os.getenv('PINECONE_API_KEY')
+openai_api = os.getenv("OPENAI_API_KEY")
+
+# Pinecone 설정 및 연결
 pinecone_client = pinecone.Pinecone()
 indexes = pinecone_client.list_indexes()
-index_name = indexes[0] if indexes else None
+# print(indexes)
+index = indexes[1].name
+# print(index)
+print("Pinecone 설정 완료.")
 
-# 벡터 DB와 Embeddings 설정
-embeddings = OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY"))
+# OpenAI Embeddings 설정
+embeddings = OpenAIEmbeddings(
+    openai_api_key=openai_api
+    )
+print("embeddings 설정 완료.")
 
-if index_name:
-    # 기존 인덱스를 사용하는 경우
-    vectorstore = Pinecone.from_existing_index(index_name, embeddings)
-else:
-    # 새로운 인덱스를 생성하는 경우
-    vectorstore = Pinecone.from_documents([], embeddings, index_name="new_index_name")
+# VectorStore 초기화
+vectorstore = Pinecone.from_existing_index(index, embeddings)
+# print(vectorstore)
+print("벡터 데이터베이스 설정 완료.")

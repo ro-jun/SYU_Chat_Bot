@@ -1,18 +1,14 @@
-from langchain.chat_models import ChatOpenAI
-from langchain.memory import ConversationBufferMemory, ConversationSummaryBufferMemory
-from langchain.chains import ConversationalRetrievalChain, ConversationChain
-from vector_db_setup import vectorstore
-from config import os
+from langchain_openai.chat_models import ChatOpenAI
+from dotenv import load_dotenv
+import os
 
-# LLM과 메모리 초기화
+# 환경 변수 로드
+load_dotenv()
+
+# LLM 초기화
 llm = ChatOpenAI(
-    model="gpt-4o",
-    temperature=0,
-    openai_api_key=os.getenv("OPENAI_API_KEY")
+    model="gpt-4o-mini",  # GPT 모델 이름
+    temperature=0,  # 결정론적 답변을 위한 설정
+    openai_api_key=os.getenv("OPENAI_API_KEY")  # API 키
 )
-memory = ConversationBufferMemory()
-conversation_chain = ConversationChain(llm=llm, memory=memory)
-
-# 질의응답 체인 설정
-retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 3})
-qa_chain = ConversationalRetrievalChain.from_llm(llm=llm, retriever=retriever)
+print("LLM 설정 완료:", llm)
