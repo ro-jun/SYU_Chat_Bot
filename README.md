@@ -51,17 +51,19 @@ python gradio_ui.py
 ## 프로젝트 구조
 ```
 SYU_CHAT_BOT/
-├── config.py             # 환경 변수 설정 파일
-├── vector_db_setup.py    # 벡터 데이터베이스 설정 및 초기화
-├── llm_setup.py          # 언어 모델(LLM) 설정
-├── qa_setup.py           # Q&A 체인 설정
-├── pdf_processing.py     # PDF 파일 처리 및 요약 기능
-├── gradio_ui.py          # Gradio UI 인터페이스 코드
-├── prompts.py            # 재사용 가능한 챗봇 프롬프트 저장
-├── main.py               # 프로젝트 전체 초기화 및 실행
-├── test.ipynb            # 기능별 테스트용 Jupyter Notebook
-├── requirements.txt      # 필수 패키지 목록
-└── .gitignore            # Git에 업로드하지 않을 파일 및 디렉토리 목록
+├── __pycache__/         # Python 캐시 디렉토리
+├── .env                 # 환경 변수 파일
+├── .gitignore           # Git 무시 파일
+├── gradio_ui.py         # Gradio UI 인터페이스 코드
+├── llm_setup.py         # 언어 모델(LLM) 설정 파일
+├── main.py              # 프로젝트 전체 초기화 및 실행 파일
+├── pdf_processing.py    # PDF 파일 처리 및 요약 기능
+├── prompts.py           # 재사용 가능한 챗봇 프롬프트 저장
+├── qa_setup.py          # Q&A 체인 설정 파일
+├── README.md            # 프로젝트 설명 파일
+├── requirements.txt     # 필수 패키지 목록
+├── test.ipynb           # 기능별 테스트용 Jupyter Notebook
+└── vector_db_setup.py   # 벡터 데이터베이스 설정 및 초기화
 ```
 
 ---
