@@ -1,5 +1,5 @@
-from vector_db_setup import vectorstore  # 벡터 DB 설정 가져오기
-from llm_setup import llm  # 이미 설정된 LLM 가져오기
+from core.vector_db_setup import vectorstore  # 벡터 DB 설정 가져오기
+from core.llm_setup import llm  # 이미 설정된 LLM 가져오기
 from langchain.chains import ConversationalRetrievalChain
 
 # Retriever 설정
